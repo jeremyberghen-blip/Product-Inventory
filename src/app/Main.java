@@ -2,7 +2,6 @@ package app;
 
 import models.Product;
 import services.Services;
-
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -22,7 +21,9 @@ public class Main {
                     
                     5. Get low stock items\
                     
-                    6. Exit""");
+                    6. Delete an item\
+                    
+                    7. Exit""");
             int selection;
             selection = scanner.nextInt();
             scanner.nextLine();
@@ -32,7 +33,8 @@ public class Main {
                 case 3 -> updateStock();
                 case 4 -> updateInfo();
                 case 5 -> lowStockProducts();
-                case 6 -> {return;}
+                case 6 -> deleteProduct();
+                case 7 -> {return;}
                 default -> System.out.println("Invalid selection");
             }
         }
@@ -138,5 +140,18 @@ public class Main {
         scanner.nextLine();
         System.out.println(product);
         database.saveProduct(product);
+    }
+
+    static private void deleteProduct(){
+        Product product = lookUpProduct().getFirst();
+        System.out.println(product +
+                "Are you sure you want to delete this product from the database?" +
+                "Y/N ");
+        String confirmation = scanner.nextLine();
+        if(confirmation.equals("Y") || confirmation.equals("y")){
+            database.deleteProduct(product.getId());
+            return;
+        }
+        System.out.println("Deletion canceled");
     }
 }

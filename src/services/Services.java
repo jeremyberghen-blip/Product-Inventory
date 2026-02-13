@@ -158,4 +158,17 @@ public class Services {
             System.out.println("Initialization error: " + e.getMessage());
         }
     }
+
+    public void deleteProduct(int id){
+        String sql = "DELETE FROM inventory WHERE id = ?";
+
+        try (Connection conn = this.connect();
+        PreparedStatement statement = conn.prepareStatement(sql)){
+            statement.setInt(1, id);
+            statement.execute();
+            System.out.println("Product successfully deleted.");
+        } catch (SQLException e){
+            System.out.println("Delete error: " + e.getMessage());
+        }
+    }
 }

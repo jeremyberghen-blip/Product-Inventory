@@ -84,20 +84,16 @@ public class Main {
 
     private static ArrayList<Product> lookUpProduct(){
         while (true){
-            System.out.println("""
+            int selection = getValidInt("""
                     1. Search by product ID\
                     
                     2. Search by product name\
                     
                     3. Search by product sku""");
-            int selection = scanner.nextInt();
-            scanner.nextLine();
             ArrayList<Product> results = new ArrayList<>();
             switch(selection) {
                 case 1 -> {
-                    System.out.println("Enter product ID");
-                    int id = scanner.nextInt();
-                    scanner.nextLine();
+                    int id = getValidInt("Enter product ID");
                     Product product = database.productLookUpId(id);
                     System.out.println(product);
                     results.add(product);
@@ -118,9 +114,6 @@ public class Main {
                     results.add(product);
                     return results;
                 }
-                case 4 -> {
-                    return new ArrayList<>();
-                }
                 default -> System.out.println("Invalid selection");
             }
         }
@@ -135,9 +128,7 @@ public class Main {
         System.out.println("Enter product price");
         product.setPrice(scanner.nextDouble());
         scanner.nextLine();
-        System.out.println("Enter product quantity in stock");
-        product.setQuantity(scanner.nextInt());
-        scanner.nextLine();
+        product.setQuantity(getValidInt("Enter product quantity in stock"));
         System.out.println(product);
         database.saveProduct(product);
     }
@@ -153,5 +144,27 @@ public class Main {
             return;
         }
         System.out.println("Deletion canceled");
+    }
+
+    static private int getValidInt(String prompt){
+        System.out.println(prompt);
+        while (!scanner.hasNextInt()){
+            System.out.println("Please enter a whole number");
+            scanner.next();
+        }
+        int entry = scanner.nextInt();
+        scanner.nextLine();
+        return entry;
+    }
+
+    static private Double getValidDouble(String prompt){
+        System.out.println(prompt);
+        while (!scanner.hasNextDouble()){
+            System.out.println("Please enter number with up to two decimal places");
+            scanner.next();
+        }
+        Double entry = scanner.nextDouble();
+        scanner.nextLine();
+        return entry;
     }
 }

@@ -28,7 +28,7 @@ public class Main {
             scanner.nextLine();
             switch(selection){
                 case 1 -> enterNewProduct();
-                case 2 -> System.out.println(lookUpProduct());
+                case 2 -> lookUpProduct();
                 case 3 -> updateStock();
                 case 4 -> updateInfo();
                 case 5 -> lowStockProducts();

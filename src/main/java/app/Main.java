@@ -39,28 +39,36 @@ public class Main {
     }
 
     private static void updateInfo(){
-        ArrayList<Product> product = lookUpProduct();
-        System.out.println("Enter new name(if different)");
-        String tempName = scanner.nextLine();
-        if(tempName.isEmpty()){tempName = product.getFirst().getName();}
-        product.getFirst().setName(tempName);
-        System.out.println("Enter new sku(if different)");
-        String tempSku = scanner.nextLine();
-        if(tempSku.isEmpty()){tempSku = product.getFirst().getSku();}
-        product.getFirst().setSku(tempSku);
-        double tempPrice = ScannerUtils.getValidDouble("Enter new price(if different)");
-        if(tempPrice == 0.00){tempPrice = product.getFirst().getPrice();}
-        product.getFirst().setPrice(tempPrice);
-        System.out.println("Enter new quantity in stock(if different)");
-        int tempStock = ScannerUtils.getValidInt("Enter new quantity in stock(if different): ");
-        if(tempStock < 0){tempStock = product.getFirst().getQuantity();}
-        product.getFirst().setQuantity(tempStock);
-        database.editProductInfo(product.getFirst().getId(), product.getFirst());
+        ArrayList<Product> products = lookUpProduct();
+        for (Product product : products) {
+            System.out.println("Enter new name(if different): ");
+            String tempName = scanner.nextLine();
+            if (tempName.isEmpty()) {
+                tempName = product.getName();
+            }
+            product.setName(tempName);
+            System.out.println("Enter new sku(if different): ");
+            String tempSku = scanner.nextLine();
+            if (tempSku.isEmpty()) {
+                tempSku = product.getSku();
+            }
+            product.setSku(tempSku);
+            double tempPrice = ScannerUtils.getValidPositiveDouble("Enter new price(if different): ");
+            if (tempPrice == -1.00) {
+                tempPrice = product.getPrice();
+            }
+            product.setPrice(tempPrice);
+            int tempStock = ScannerUtils.getValidPositiveInt("Enter new quantity in stock(if different): ");
+            if (tempStock < 0) {
+                tempStock = product.getQuantity();
+            }
+            product.setQuantity(tempStock);
+            database.editProductInfo(product.getId(), product);
+        }
     }
 
     private static void lowStockProducts(){
-        int threshold = ScannerUtils.getValidInt("Enter threshold for 'low stock': ");
-        scanner.nextLine();
+        int threshold = ScannerUtils.getValidPositiveInt("Enter threshold for 'low stock': ");
         ArrayList<Product> results = database.getLowStock(threshold);
         for (Product result : results) {
             System.out.println(result);
@@ -69,9 +77,11 @@ public class Main {
 
     private static void updateStock(){
         ArrayList<Product> product = lookUpProduct();
-        int newStock = product.getFirst().getQuantity() + ScannerUtils.getValidInt("Enter change to stock: ");
-        product.getFirst().setQuantity(newStock);
-        database.editProductInfo(product.getFirst().getId(), product.getFirst());
+        for(int i = 0; i < product.size(); i++) {
+            int newStock = product.getFirst().getQuantity() + ScannerUtils.getValidInt("Enter change to stock: ");
+            product.getFirst().setQuantity(newStock);
+            database.editProductInfo(product.getFirst().getId(), product.getFirst());
+        }
     }
 
     private static ArrayList<Product> lookUpProduct(){
@@ -114,31 +124,36 @@ public class Main {
     private static void enterNewProduct(){
         Product product = new Product();
         System.out.println("Enter product name: ");
-        product.setName(scanner.nextLine());
+        product.setName(scanner.nextLine().trim());
         System.out.println("Enter product sku: ");
-        product.setSku(scanner.nextLine());
+        product.setSku(scanner.nextLine().toUpperCase().trim());
         System.out.println("Enter product price: ");
-        product.setPrice(ScannerUtils.getValidDouble("Enter product price: "));
+        product.setPrice(ScannerUtils.getValidPositiveDouble("Enter product price: "));
         scanner.nextLine();
-        product.setQuantity(ScannerUtils.getValidInt("Enter product quantity in stock: "));
+        product.setQuantity(ScannerUtils.getValidPositiveInt("Enter product quantity in stock: "));
         System.out.println(product);
         database.saveProduct(product);
     }
 
     static private void deleteProduct() {
-        Product product = lookUpProduct().getFirst();
-        while (true) {
-            System.out.println(product +
-                    "Are you sure you want to delete this product from the database?" +
-                    "Y/N ");
-            String confirmation = scanner.nextLine();
-            if (confirmation.equals("Y") || confirmation.equals("y")) {
-                database.deleteProduct(product.getId());
-                return;
-            }
-            if(confirmation.equals("N") || confirmation.equals("n")){
-                System.out.println("Deletion Canceled");
-                return;
+        ArrayList<Product> products = lookUpProduct();
+        for (Product product : products) {
+            boolean goAhead = false;
+            while (!goAhead) {
+                System.out.println(product +
+                        "\nAre you sure you want to delete this product from the database?" +
+                        "\nY/N: ");
+                String confirmation = scanner.nextLine().trim();
+                if (confirmation.equalsIgnoreCase("y")) {
+                    database.deleteProduct(product.getId());
+                    System.out.println("Product deleted");
+                    goAhead = true;
+                } else if (confirmation.equalsIgnoreCase("n")) {
+                    System.out.println("Deletion Canceled");
+                    goAhead = true;
+                } else {
+                    System.out.println("Invalid entry");
+                }
             }
         }
     }

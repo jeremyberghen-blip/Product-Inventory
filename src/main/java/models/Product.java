@@ -47,7 +47,7 @@ public class Product {
     }
 
     public void setPrice(double price){
-        if(price < 0){this.price = 0.00; System.out.println("price cannot be less than 0.00, quantity set to 0.00");}
+        if(price < 0){this.price = 0.00; System.out.println("price cannot be less than 0.00, price set to 0.00");}
         else {this.price = price;}
     }
 

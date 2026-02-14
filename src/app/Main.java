@@ -121,29 +121,34 @@ public class Main {
 
     private static void enterNewProduct(){
         Product product = new Product();
-        System.out.println("Enter product name");
+        System.out.println("Enter product name: ");
         product.setName(scanner.nextLine());
-        System.out.println("Enter product sku");
+        System.out.println("Enter product sku: ");
         product.setSku(scanner.nextLine());
-        System.out.println("Enter product price");
-        product.setPrice(scanner.nextDouble());
+        System.out.println("Enter product price: ");
+        product.setPrice(getValidDouble("Enter product price: "));
         scanner.nextLine();
-        product.setQuantity(getValidInt("Enter product quantity in stock"));
+        product.setQuantity(getValidInt("Enter product quantity in stock: "));
         System.out.println(product);
         database.saveProduct(product);
     }
 
-    static private void deleteProduct(){
+    static private void deleteProduct() {
         Product product = lookUpProduct().getFirst();
-        System.out.println(product +
-                "Are you sure you want to delete this product from the database?" +
-                "Y/N ");
-        String confirmation = scanner.nextLine();
-        if(confirmation.equals("Y") || confirmation.equals("y")){
-            database.deleteProduct(product.getId());
-            return;
+        while (true) {
+            System.out.println(product +
+                    "Are you sure you want to delete this product from the database?" +
+                    "Y/N ");
+            String confirmation = scanner.nextLine();
+            if (confirmation.equals("Y") || confirmation.equals("y")) {
+                database.deleteProduct(product.getId());
+                return;
+            }
+            if(confirmation.equals("N") || confirmation.equals("n")){
+                System.out.println("Deletion Canceled");
+                return;
+            }
         }
-        System.out.println("Deletion canceled");
     }
 
     static private int getValidInt(String prompt){

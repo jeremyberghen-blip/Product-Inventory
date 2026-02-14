@@ -10,7 +10,7 @@ public class Main {
     static Scanner scanner = new Scanner(System.in);
     static void main(String[] args) {
         while (true) {
-            System.out.println("""
+            int selection = getValidInt("""
                     1. Enter a New Product\
                     
                     2. Look up a product\
@@ -24,9 +24,6 @@ public class Main {
                     6. Delete an item\
                     
                     7. Exit""");
-            int selection;
-            selection = scanner.nextInt();
-            scanner.nextLine();
             switch(selection){
                 case 1 -> enterNewProduct();
                 case 2 -> lookUpProduct();

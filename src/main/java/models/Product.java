@@ -1,7 +1,7 @@
 package models;
 
 public class Product {
-    private int id = 0;
+    private int id;
     private int quantity = 0;
     private double price = 0.00;
     private String sku = "Enter sku";
@@ -42,11 +42,13 @@ public class Product {
     }
 
     public void setQuantity(int quantity){
-        this.quantity = quantity;
+        if(quantity < 0){this.quantity = 0; System.out.println("quantity cannot be less than 0, quantity set to 0");}
+        else {this.quantity = quantity;}
     }
 
     public void setPrice(double price){
-        this.price = price;
+        if(price < 0){this.price = 0.00; System.out.println("price cannot be less than 0.00, quantity set to 0.00");}
+        else {this.price = price;}
     }
 
     public void setSku(String sku){

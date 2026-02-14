@@ -4,29 +4,63 @@ import java.util.Scanner;
 
 public class ScannerUtils {
     static Scanner scanner = new Scanner(System.in);
-    public static int getValidInt(String prompt){
-        System.out.println(prompt);
-        while (!scanner.hasNextInt()){
-            System.out.println("Please enter a whole number");
-            scanner.next();
+    public static int getValidInt(String prompt){      //Exiting will return 0
+        while (true){
+            System.out.println(prompt);
+            String input = scanner.nextLine().trim();
+            if(input.equalsIgnoreCase("exit")){return -1;}
+            try {
+                return Integer.parseInt(input);
+            } catch (NumberFormatException e){
+                System.out.println("Invalid input. Enter a whole integer, or exit");
+            }
         }
-        int entry = scanner.nextInt();
-        scanner.nextLine();
-        return entry;
     }
 
-    public static int getValidPositiveInt(String prompt){}
-
-    public static double getValidDouble(String prompt){
-        System.out.println(prompt);
-        while (!scanner.hasNextDouble()){
-            System.out.println("Please enter number with up to two decimal places");
-            scanner.next();
+    public static int getValidPositiveInt(String prompt){
+        while (true){
+            System.out.println(prompt);
+            String input = scanner.nextLine().trim();
+            if(input.equalsIgnoreCase("exit")){return -1;}
+            try {
+                int result = Integer.parseInt(input);
+                if(result >= 0){return result;} else {
+                    System.out.println("Number must be 0 or greater");
+                }
+            } catch (NumberFormatException e){
+                System.out.println("Invalid input. Enter a whole integer, or exit");
+            }
         }
-        Double entry = scanner.nextDouble();
-        scanner.nextLine();
-        return entry;
     }
 
-    public static double getValidPositiveDouble(String prompt){}
+    public static double getValidDouble(String prompt) {
+        while (true) {
+            System.out.println(prompt);
+            String input = scanner.nextLine().trim();
+            if (input.equalsIgnoreCase("exit")) {
+                return -1.00;
+            }
+            try {
+                return Double.parseDouble(input);
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Enter a whole integer, or exit");
+            }
+        }
+    }
+
+    public static double getValidPositiveDouble(String prompt){
+            while (true){
+                System.out.println(prompt);
+                String input = scanner.nextLine().trim();
+                if(input.equalsIgnoreCase("exit")){return -1.00;}
+                try {
+                    double result = Double.parseDouble(input);
+                    if(result >= 0){return result;} else {
+                        System.out.println("Number must be 0 or greater");
+                    }
+                } catch (NumberFormatException e){
+                    System.out.println("Invalid input. Enter a whole integer, or exit");
+                }
+            }
+    }
 }

@@ -50,22 +50,18 @@ public class Main {
         String tempSku = scanner.nextLine();
         if(tempSku.isEmpty()){tempSku = product.getFirst().getSku();}
         product.getFirst().setSku(tempSku);
-        System.out.println("Enter new price(if different)");
-        double tempPrice = scanner.nextDouble();
-        scanner.nextLine();
+        double tempPrice = getValidDouble("Enter new price(if different)");
         if(tempPrice == 0.00){tempPrice = product.getFirst().getPrice();}
         product.getFirst().setPrice(tempPrice);
         System.out.println("Enter new quantity in stock(if different)");
-        int tempStock = scanner.nextInt();
-        scanner.nextLine();
+        int tempStock = getValidInt("Enter new quantity in stock(if different): ");
         if(tempStock < 0){tempStock = product.getFirst().getQuantity();}
         product.getFirst().setQuantity(tempStock);
         database.editProductInfo(product.getFirst().getId(), product.getFirst());
     }
 
     private static void lowStockProducts(){
-        System.out.println("Enter threshold for 'low stock': ");
-        int threshold = scanner.nextInt();
+        int threshold = getValidInt("Enter threshold for 'low stock': ");
         scanner.nextLine();
         ArrayList<Product> results = database.getLowStock(threshold);
         for (Product result : results) {
@@ -75,9 +71,7 @@ public class Main {
 
     private static void updateStock(){
         ArrayList<Product> product = lookUpProduct();
-        System.out.println("Enter difference in stock");
-        int newStock = product.getFirst().getQuantity() + scanner.nextInt();
-        scanner.nextLine();
+        int newStock = product.getFirst().getQuantity() + getValidInt("Enter change to stock: ");
         product.getFirst().setQuantity(newStock);
         database.editProductInfo(product.getFirst().getId(), product.getFirst());
     }

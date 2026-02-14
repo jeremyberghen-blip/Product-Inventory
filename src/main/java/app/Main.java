@@ -4,13 +4,14 @@ import java.util.ArrayList;
 import java.util.Scanner;
 import services.Services;
 import models.Product;
+import utils.ScannerUtils;
 
 public class Main {
     static Services database = new Services();
     static Scanner scanner = new Scanner(System.in);
     public static void main(String[] args) {
         while (true) {
-            int selection = getValidInt("""
+            int selection = ScannerUtils.getValidInt("""
                     1. Enter a New Product\
                     
                     2. Look up a product\
@@ -47,18 +48,18 @@ public class Main {
         String tempSku = scanner.nextLine();
         if(tempSku.isEmpty()){tempSku = product.getFirst().getSku();}
         product.getFirst().setSku(tempSku);
-        double tempPrice = getValidDouble("Enter new price(if different)");
+        double tempPrice = ScannerUtils.getValidDouble("Enter new price(if different)");
         if(tempPrice == 0.00){tempPrice = product.getFirst().getPrice();}
         product.getFirst().setPrice(tempPrice);
         System.out.println("Enter new quantity in stock(if different)");
-        int tempStock = getValidInt("Enter new quantity in stock(if different): ");
+        int tempStock = ScannerUtils.getValidInt("Enter new quantity in stock(if different): ");
         if(tempStock < 0){tempStock = product.getFirst().getQuantity();}
         product.getFirst().setQuantity(tempStock);
         database.editProductInfo(product.getFirst().getId(), product.getFirst());
     }
 
     private static void lowStockProducts(){
-        int threshold = getValidInt("Enter threshold for 'low stock': ");
+        int threshold = ScannerUtils.getValidInt("Enter threshold for 'low stock': ");
         scanner.nextLine();
         ArrayList<Product> results = database.getLowStock(threshold);
         for (Product result : results) {
@@ -68,14 +69,14 @@ public class Main {
 
     private static void updateStock(){
         ArrayList<Product> product = lookUpProduct();
-        int newStock = product.getFirst().getQuantity() + getValidInt("Enter change to stock: ");
+        int newStock = product.getFirst().getQuantity() + ScannerUtils.getValidInt("Enter change to stock: ");
         product.getFirst().setQuantity(newStock);
         database.editProductInfo(product.getFirst().getId(), product.getFirst());
     }
 
     private static ArrayList<Product> lookUpProduct(){
         while (true){
-            int selection = getValidInt("""
+            int selection = ScannerUtils.getValidInt("""
                     1. Search by product ID\
                     
                     2. Search by product name\
@@ -84,7 +85,7 @@ public class Main {
             ArrayList<Product> results = new ArrayList<>();
             switch(selection) {
                 case 1 -> {
-                    int id = getValidInt("Enter product ID");
+                    int id = ScannerUtils.getValidInt("Enter product ID");
                     Product product = database.productLookUpId(id);
                     System.out.println(product);
                     results.add(product);
@@ -117,9 +118,9 @@ public class Main {
         System.out.println("Enter product sku: ");
         product.setSku(scanner.nextLine());
         System.out.println("Enter product price: ");
-        product.setPrice(getValidDouble("Enter product price: "));
+        product.setPrice(ScannerUtils.getValidDouble("Enter product price: "));
         scanner.nextLine();
-        product.setQuantity(getValidInt("Enter product quantity in stock: "));
+        product.setQuantity(ScannerUtils.getValidInt("Enter product quantity in stock: "));
         System.out.println(product);
         database.saveProduct(product);
     }
@@ -140,27 +141,5 @@ public class Main {
                 return;
             }
         }
-    }
-
-    static private int getValidInt(String prompt){
-        System.out.println(prompt);
-        while (!scanner.hasNextInt()){
-            System.out.println("Please enter a whole number");
-            scanner.next();
-        }
-        int entry = scanner.nextInt();
-        scanner.nextLine();
-        return entry;
-    }
-
-    static private Double getValidDouble(String prompt){
-        System.out.println(prompt);
-        while (!scanner.hasNextDouble()){
-            System.out.println("Please enter number with up to two decimal places");
-            scanner.next();
-        }
-        Double entry = scanner.nextDouble();
-        scanner.nextLine();
-        return entry;
     }
 }

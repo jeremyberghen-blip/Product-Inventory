@@ -14,13 +14,19 @@ public class Services {
     }
 
     public void saveProduct(Product product){
-        //validate product first
-        dao.addProduct(product);
+        if(verifyProduct(product)){
+            dao.addProduct(product);
+        } else {
+            System.out.println("Invalid product. Cannot add to database");
+        }
     }
 
     public void editProductInfo(Product product){
-        //write safeguards
-        dao.updateProduct(product);
+        if(verifyProduct(product)){
+            dao.updateProduct(product);
+        } else {
+            System.out.println("Invalid information");
+        }
     }
 
     public List<Product> getLowStock(int threshold){

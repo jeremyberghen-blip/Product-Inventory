@@ -28,47 +28,93 @@ public class Main {
                     
                     6. Delete an item\
                     
-                    7. Exit""");
+                    7. Select multiple products by id\
+                    
+                    8. Select multiple products by sku\
+                    
+                    9. Delete multiple products by id\
+                    
+                    10.Delete multiple products by sku\
+                    
+                    11. Exit""");
             switch(selection){
-                case 1 -> enterNewProduct();
-                case 2 -> lookUpProduct();
-                case 3 -> updateStock();
-                case 4 -> updateInfo();
-                case 5 -> lowStockProducts();
-                case 6 -> deleteProduct();
-                case 7 -> {return;}
+                case 1  -> enterNewProduct();
+                case 2  -> lookUpProduct();
+                case 3  -> updateStock();
+                case 4  -> updateInfo();
+                case 5  -> lowStockProducts();
+                case 6  -> deleteProduct();
+                case 7  -> selectMultipleById();
+                case 8  -> selectMultipleBySku();
+                case 9  -> deleteMultipleById();
+                case 10 -> deleteMultipleBySku();
+                case 11 -> {return;}
                 default -> System.out.println("Invalid selection");
             }
         }
     }
 
+    public static void selectMultipleById(){
+        ArrayList<Integer> ids = new ArrayList<>();
+        while (true){
+            ids.add(ScannerUtils.getValidInt("Enter product ID: "));
+            if(ids.getLast() == null || !ScannerUtils.getYesNo("Select another product?: \nY/n")){break;}
+        }
+        ArrayList<Product> results = new ArrayList<>(database.getListById(ids));
+        for (Product product: results){
+            System.out.println(product);
+        }
+    }
+
+    public static void selectMultipleBySku(){
+        ArrayList<String> skus = new ArrayList<>();
+        while (true){
+            skus.add(ScannerUtils.getValidString("Enter product ID: "));
+            if(skus.getLast() == null || !ScannerUtils.getYesNo("Select another product?: \nY/n")){break;}
+        }
+        ArrayList<Product> results = new ArrayList<>(database.getListBySku(skus));
+        for (Product product: results){
+            System.out.println(product);
+        }
+    }
+
+    public static void deleteMultipleById(){
+
+    }
+
+    public static void deleteMultipleBySku(){
+
+    }
+
     private static void updateInfo(){
         ArrayList<Product> products = lookUpProduct();
-        for (Product product : products) {
-            System.out.println("Enter new name(if different): ");
-            String tempName = scanner.nextLine();
-            if (tempName.isEmpty()) {
-                tempName = product.getName();
+        if(products != null && !products.isEmpty()){
+            for (Product product : products) {
+                System.out.println("Enter new name(if different): ");
+                String tempName = scanner.nextLine();
+                if (tempName.isEmpty()) {
+                    tempName = product.getName();
+                }
+                product.setName(tempName);
+               System.out.println("Enter new sku(if different): ");
+               String tempSku = scanner.nextLine();
+               if (tempSku.isEmpty()) {
+                   tempSku = product.getSku();
+               }
+               product.setSku(tempSku);
+               double tempPrice = ScannerUtils.getValidPositiveDouble("Enter new price(if different): ");
+               if (tempPrice == -1.00) {
+                   tempPrice = product.getPrice();
+              }
+               product.setPrice(tempPrice);
+                int tempStock = ScannerUtils.getValidPositiveInt("Enter new quantity in stock(if different): ");
+                if (tempStock < 0) {
+                        tempStock = product.getStock();
+                }
+                product.setStock(tempStock);
+                database.editProductInfo(product);
             }
-            product.setName(tempName);
-            System.out.println("Enter new sku(if different): ");
-            String tempSku = scanner.nextLine();
-            if (tempSku.isEmpty()) {
-                tempSku = product.getSku();
-            }
-            product.setSku(tempSku);
-            double tempPrice = ScannerUtils.getValidPositiveDouble("Enter new price(if different): ");
-            if (tempPrice == -1.00) {
-                tempPrice = product.getPrice();
-            }
-            product.setPrice(tempPrice);
-            int tempStock = ScannerUtils.getValidPositiveInt("Enter new quantity in stock(if different): ");
-            if (tempStock < 0) {
-                tempStock = product.getStock();
-            }
-            product.setStock(tempStock);
-            database.editProductInfo(product);
-        }
+        } else {System.out.println("No items returned while updating");}
     }
 
     private static void lowStockProducts(){
@@ -80,12 +126,24 @@ public class Main {
     }
 
     private static void updateStock(){
-        ArrayList<Product> product = lookUpProduct();
-        for(int i = 0; i < product.size(); i++) {
-            int newStock = product.getFirst().getStock() + ScannerUtils.getValidInt("Enter change to stock: ");
-            product.getFirst().setStock(newStock);
-            database.editProductInfo(product.getFirst());
+        ArrayList<Product> products = new ArrayList<>();
+        ArrayList<Product> updatedInfo = new ArrayList<>();
+        while (true){
+            products.addAll(lookUpProduct());
+            if(!products.isEmpty()){
+                for (Product product: products){
+                    int newStock = product.getStock() + ScannerUtils.getValidInt("Enter change to stock: ");
+                    if(newStock < 0){System.out.println("Insufficient stock. Change canceled.");} else {
+                        product.setStock(newStock);
+                    }
+                    updatedInfo.add(product);
+                }
+            } else {System.out.println("No product selected to update");}
+            if(!ScannerUtils.getYesNo("Update another product?: ")){
+                break;
+            }
         }
+        database.updateAll(updatedInfo);
     }
 
     private static ArrayList<Product> lookUpProduct(){
@@ -111,6 +169,7 @@ public class Main {
                     results.add(product);
                     return results;
                 }
+                case -1 -> {return null;} //exited out without completing the search
                 default -> System.out.println("Invalid selection");
             }
         }
@@ -128,23 +187,12 @@ public class Main {
 
     static private void deleteProduct() {
         ArrayList<Product> products = lookUpProduct();
-        for (Product product : products) {
-            boolean goAhead = false;
-            while (!goAhead) {
-                System.out.println(product +
-                        "\nAre you sure you want to delete this product from the database?" +
-                        "\nY/N: ");
-                String confirmation = scanner.nextLine().trim();
-                if (confirmation.equalsIgnoreCase("y")) {
+        if (products != null && !products.isEmpty()){
+            for (Product product : products) {
+                if (ScannerUtils.getYesNo(product +
+                        "\nAre you sure? \nY/N")) {
                     database.deleteProduct(product);
-                    System.out.println("Product deleted");
-                    goAhead = true;
-                } else if (confirmation.equalsIgnoreCase("n")) {
-                    System.out.println("Deletion Canceled");
-                    goAhead = true;
-                } else {
-                    System.out.println("Invalid entry");
-                }
+                } else {System.out.println("Deletion cancelled.");}
             }
         }
     }

@@ -75,4 +75,21 @@ public class ScannerUtils {
             }
         }
     }
+
+    public static boolean getYesNo(String prompt){
+        while (true) {
+            System.out.println(prompt);
+            String answer = scanner.nextLine();
+            if(answer!= null
+                    && !answer.isEmpty()){
+                if(answer.equalsIgnoreCase("y" )
+                        || answer.equalsIgnoreCase("yes")){
+                    return true;
+                } else if(answer.equalsIgnoreCase("n" )
+                        || answer.equalsIgnoreCase("no")){
+                    return false;
+                }
+            }
+        }
+    }
 }

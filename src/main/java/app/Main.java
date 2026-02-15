@@ -2,12 +2,16 @@ package app;
 
 import java.util.ArrayList;
 import java.util.Scanner;
+
+import dao.ProductDao;
 import services.Services;
 import models.Product;
 import utils.ScannerUtils;
+import dao.MockDao;
 
 public class Main {
-    static Services database = new Services();
+    private static final ProductDao myDao = new MockDao();
+    private static final Services database = new Services(myDao);
     static Scanner scanner = new Scanner(System.in);
     public static void main(String[] args) {
         while (true) {
@@ -60,16 +64,16 @@ public class Main {
             product.setPrice(tempPrice);
             int tempStock = ScannerUtils.getValidPositiveInt("Enter new quantity in stock(if different): ");
             if (tempStock < 0) {
-                tempStock = product.getQuantity();
+                tempStock = product.getStock();
             }
-            product.setQuantity(tempStock);
-            database.editProductInfo(product.getId(), product);
+            product.setStock(tempStock);
+            database.editProductInfo(product);
         }
     }
 
     private static void lowStockProducts(){
         int threshold = ScannerUtils.getValidPositiveInt("Enter threshold for 'low stock': ");
-        ArrayList<Product> results = database.getLowStock(threshold);
+        ArrayList<Product> results = new ArrayList<>(database.getLowStock(threshold));
         for (Product result : results) {
             System.out.println(result);
         }
@@ -78,9 +82,9 @@ public class Main {
     private static void updateStock(){
         ArrayList<Product> product = lookUpProduct();
         for(int i = 0; i < product.size(); i++) {
-            int newStock = product.getFirst().getQuantity() + ScannerUtils.getValidInt("Enter change to stock: ");
-            product.getFirst().setQuantity(newStock);
-            database.editProductInfo(product.getFirst().getId(), product.getFirst());
+            int newStock = product.getFirst().getStock() + ScannerUtils.getValidInt("Enter change to stock: ");
+            product.getFirst().setStock(newStock);
+            database.editProductInfo(product.getFirst());
         }
     }
 
@@ -96,7 +100,7 @@ public class Main {
             switch(selection) {
                 case 1 -> {
                     int id = ScannerUtils.getValidInt("Enter product ID");
-                    Product product = database.productLookUpId(id);
+                    Product product = database.productLookUpById(id);
                     System.out.println(product);
                     results.add(product);
                     return results;
@@ -104,14 +108,14 @@ public class Main {
                 case 2 -> {
                     System.out.println("Enter product name");
                     String name = scanner.nextLine();
-                    ArrayList<Product> product = database.productLookUpName(name);
+                    ArrayList<Product> product = database.productLookUpByName(name);
                     System.out.println(product);
                     return product;
                 }
                 case 3 -> {
                     System.out.println("Enter product sku");
                     String sku = scanner.nextLine();
-                    Product product = database.productLookUpSku(sku);
+                    Product product = database.productLookUpBySku(sku);
                     System.out.println(product);
                     results.add(product);
                     return results;
@@ -130,7 +134,7 @@ public class Main {
         System.out.println("Enter product price: ");
         product.setPrice(ScannerUtils.getValidPositiveDouble("Enter product price: "));
         scanner.nextLine();
-        product.setQuantity(ScannerUtils.getValidPositiveInt("Enter product quantity in stock: "));
+        product.setStock(ScannerUtils.getValidPositiveInt("Enter product quantity in stock: "));
         System.out.println(product);
         database.saveProduct(product);
     }

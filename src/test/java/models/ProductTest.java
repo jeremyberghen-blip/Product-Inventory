@@ -3,7 +3,6 @@ package models;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
-import models.Product;
 
 public class ProductTest {
     Product product;
@@ -27,14 +26,14 @@ public class ProductTest {
     @Test
     void testNegativeStockThrowsException() {
         assertThrows(IllegalArgumentException.class, () -> {
-            product.setQuantity(-5);
+            product.setStock(-5);
         });
     }
 
     @Test
     void testValidStockSaved() {
-        product.setQuantity(42);
+        product.setStock(42);
 
-        assertEquals(42, product.getQuantity());
+        assertEquals(42, product.getStock());
     }
 }

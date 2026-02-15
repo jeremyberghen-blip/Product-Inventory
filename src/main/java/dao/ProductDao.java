@@ -4,6 +4,7 @@ import models.Product;
 import java.util.List;
 
 public interface ProductDao {
+    void initializeDB();
     void addProduct(Product product);
     Product getProductBySku(String sku);
     Product getProductById(int id);

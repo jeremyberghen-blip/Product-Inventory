@@ -33,7 +33,7 @@ public class SQLiteDAO {
             ResultSet results = statement.executeQuery();
             while(results.next()){
                 Product  product = new Product();
-                product.setQuantity(results.getInt("stock"));
+                product.setStock(results.getInt("stock"));
                 product.setPrice(results.getDouble("price"));
                 product.setSku(results.getString("sku"));
                 product.setName(results.getString("product_name"));
@@ -58,7 +58,7 @@ public class SQLiteDAO {
                 product.setName(results.getString("product_name"));
                 product.setSku(results.getString("sku"));
                 product.setPrice(results.getDouble("price"));
-                product.setQuantity(results.getInt("stock"));
+                product.setStock(results.getInt("stock"));
             }
         } catch (SQLException e){
             System.out.println("Save error: " + e.getMessage());
@@ -78,7 +78,7 @@ public class SQLiteDAO {
                 product.setName(results.getString("product_name"));
                 product.setSku(results.getString("sku"));
                 product.setPrice(results.getDouble("price"));
-                product.setQuantity(results.getInt("stock"));
+                product.setStock(results.getInt("stock"));
             }
         } catch (SQLException e){
             System.out.println("Save error: " + e.getMessage());
@@ -96,10 +96,10 @@ public class SQLiteDAO {
                 ResultSet results = statement.executeQuery();
                 while (results.next()){
                     Product product = new Product(
-                            results.getInt("stock"),
-                            results.getDouble("price"),
+                            results.getString("product_name"),
                             results.getString("sku"),
-                            results.getString("product_name"));
+                            results.getInt("stock"),
+                            results.getDouble("price"));
                     product.setId(results.getInt("id"));
                     products.add(product);
                 }
@@ -124,7 +124,7 @@ public class SQLiteDAO {
             statement.setString(1, updatedInfo.getName());
             statement.setString(2, updatedInfo.getSku());
             statement.setDouble(3, updatedInfo.getPrice());
-            statement.setInt(4, updatedInfo.getQuantity());
+            statement.setInt(4, updatedInfo.getStock());
             statement.setInt(5, product.getId());
             statement.execute();
         } catch (SQLException e){

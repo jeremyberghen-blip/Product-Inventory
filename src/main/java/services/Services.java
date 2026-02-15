@@ -3,6 +3,7 @@ package services;
 import models.Product;
 import dao.ProductDao;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Services {
@@ -14,7 +15,7 @@ public class Services {
 
     public void saveProduct(Product product){
         //validate product first
-        this.dao.addProduct(product);
+        dao.addProduct(product);
     }
 
     public void editProductInfo(Product product){
@@ -43,7 +44,29 @@ public class Services {
         }
     }
 
+    public void deleteProduct(Product product){
+        dao.deleteById(product.getId());
+    }
 
+    public List<Product> getListById(ArrayList<Integer> list){
+        return dao.getListById(list);
+    }
+
+    public List<Product> getListBySku(ArrayList<String> list){
+        return dao.getListBySku(list);
+    }
+
+    public void deleteAll(ArrayList<Integer> list){
+        dao.deleteAll(list);
+    }
+
+    public void deleteBySku(String sku){
+        dao.deleteBySku(sku);
+    }
+
+    public void updateAll(ArrayList<Product> list){
+        dao.updateAll(list);
+    }
 
     private boolean verifyProduct(Product product){
         return (verifyName(product.getName())

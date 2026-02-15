@@ -93,9 +93,7 @@ public class Main {
             int selection = ScannerUtils.getValidInt("""
                     1. Search by product ID\
                     
-                    2. Search by product name\
-                    
-                    3. Search by product sku""");
+                    2. Search by product sku""");
             ArrayList<Product> results = new ArrayList<>();
             switch(selection) {
                 case 1 -> {
@@ -106,13 +104,6 @@ public class Main {
                     return results;
                 }
                 case 2 -> {
-                    System.out.println("Enter product name");
-                    String name = scanner.nextLine();
-                    ArrayList<Product> product = database.productLookUpByName(name);
-                    System.out.println(product);
-                    return product;
-                }
-                case 3 -> {
                     System.out.println("Enter product sku");
                     String sku = scanner.nextLine();
                     Product product = database.productLookUpBySku(sku);
@@ -127,13 +118,9 @@ public class Main {
 
     private static void enterNewProduct(){
         Product product = new Product();
-        System.out.println("Enter product name: ");
-        product.setName(scanner.nextLine().trim());
-        System.out.println("Enter product sku: ");
-        product.setSku(scanner.nextLine().toUpperCase().trim());
-        System.out.println("Enter product price: ");
+        product.setName(ScannerUtils.getValidString( "Enter product name: "));
+        product.setSku(ScannerUtils.getValidString("Enter product sku: ").toUpperCase().trim());
         product.setPrice(ScannerUtils.getValidPositiveDouble("Enter product price: "));
-        scanner.nextLine();
         product.setStock(ScannerUtils.getValidPositiveInt("Enter product quantity in stock: "));
         System.out.println(product);
         database.saveProduct(product);
@@ -149,7 +136,7 @@ public class Main {
                         "\nY/N: ");
                 String confirmation = scanner.nextLine().trim();
                 if (confirmation.equalsIgnoreCase("y")) {
-                    database.deleteProduct(product.getId());
+                    database.deleteProduct(product);
                     System.out.println("Product deleted");
                     goAhead = true;
                 } else if (confirmation.equalsIgnoreCase("n")) {

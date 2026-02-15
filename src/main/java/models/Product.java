@@ -2,10 +2,10 @@ package models;
 
 public class Product {
     private int id;
-    private int stock = 0;
-    private double price = 0.00;
-    private String sku = "Enter sku";
-    private String name = "Enter name";
+    private int stock;
+    private double price;
+    private String sku;
+    private String name;
 
     public Product(){    }
 

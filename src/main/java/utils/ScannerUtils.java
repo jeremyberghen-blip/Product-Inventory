@@ -63,4 +63,16 @@ public class ScannerUtils {
                 }
             }
     }
+
+    public static String getValidString(String prompt) {
+        while (true) {
+            System.out.println(prompt);
+            String output = scanner.nextLine().trim();
+            if (!output.isEmpty()) {
+                return output;
+            } else {
+                System.out.println("Cannot be empty");
+            }
+        }
+    }
 }

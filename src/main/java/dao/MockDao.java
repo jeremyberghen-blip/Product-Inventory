@@ -16,8 +16,19 @@ public class MockDao implements ProductDao{
 
     }
 
-    public void addProduct(List<Product> productList){
+    private int getId(){
+        int id = 0;
+        while (true){
+            if(inventoryById.containsKey(id)){id++;} else {return id;}
+        }
+    }
 
+    public void addProduct(List<Product> productList){
+        for(Product product: productList){
+            product.setId(getId());
+            inventoryById.put(product.getId(), product);
+            inventoryBySku.put(product.getSku(), product);
+        }
     }
 
     public List<Product> getLowStock(int stockThreshold){

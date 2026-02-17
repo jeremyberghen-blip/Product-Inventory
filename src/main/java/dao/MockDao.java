@@ -45,7 +45,6 @@ public class MockDao implements ProductDao{
     }
 
     public List<Product> getListBySku(List<String> skus){
-
         ArrayList<Product> results = new ArrayList<>();
         for(String sku: skus){results.add(inventoryBySku.get(sku));}
         return results;
@@ -65,7 +64,7 @@ public class MockDao implements ProductDao{
         System.out.println("Products successfully updated");
     }
 
-    public void deleteById(int id){
+    public void deleteById(Product product){
         inventoryBySku.remove(inventoryById.get(id).getSku());
         inventoryById.remove(id);
         System.out.println("Product successfully deleted");
@@ -77,8 +76,8 @@ public class MockDao implements ProductDao{
         System.out.println("Product successfully deleted");
     }
 
-    public void deleteAll(List<Integer> ids){
-        for(int id: ids){
+    public void deleteAll(List<Product> productList){
+        for(int id: productList){
             inventoryBySku.remove(inventoryById.get(id).getSku());
             inventoryById.remove(id);
         }

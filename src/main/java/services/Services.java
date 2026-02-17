@@ -13,19 +13,19 @@ public class Services {
         this.dao = dao;
     }
 
-    public void saveProduct(Product product){
-        if(verifyProduct(product)){
-            dao.addProduct(product);
-        } else {
-            System.out.println("Invalid product. Cannot add to database");
+    public void saveProduct(List<Product> productList){
+        for (Product product: productList){
+            if(!verifyProduct(product)){
+                System.out.println(product + "\nInvalid product. Cannot add to database");
+                productList.remove(product);
+            }
         }
+        dao.addProduct(productList);
     }
 
-    public void editProductInfo(Product product){
-        if(verifyProduct(product)){
-            dao.updateProduct(product);
-        } else {
-            System.out.println("Invalid information");
+    public void editProductInfo(List<Product> productList){
+        if (productList != null && !productList.isEmpty()){
+
         }
     }
 
@@ -33,25 +33,14 @@ public class Services {
         return dao.getLowStock(threshold);
     }
 
-    public Product productLookUpById(int id){
-        return dao.getProductById(id);
+    public List<Product> productLookUpById(int id) {
+        return dao.getProductById(List.of(id));
     }
 
-    public Product productLookUpBySku(String sku){
-        if(verifySku(sku)){
-            Product product = dao.getProductBySku(sku);
-            if(verifyProduct(product)){return product;} else {
-                System.out.println("No product found");
-                return new Product();
-            }
-        } else {
-            System.out.println("invalid sku");
-            return new Product();
-        }
-    }
-
-    public void deleteProduct(Product product){
-        dao.deleteById(product.getId());
+    public List<Product> productLookUpBySku(String sku){
+        if(verifySku(sku)) {
+            return dao.getProductBySku(List.of(sku));
+        } else {return null;}
     }
 
     public List<Product> getListById(ArrayList<Integer> list){
@@ -62,17 +51,6 @@ public class Services {
         return dao.getListBySku(list);
     }
 
-    public void deleteAll(ArrayList<Integer> list){
-        dao.deleteAll(list);
-    }
-
-    public void deleteBySku(String sku){
-        dao.deleteBySku(sku);
-    }
-
-    public void updateAll(ArrayList<Product> list){
-        dao.updateAll(list);
-    }
 
     private boolean verifyProduct(Product product){
         return (verifyName(product.getName())

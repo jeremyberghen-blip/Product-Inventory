@@ -46,9 +46,8 @@ public class Main {
                 case 6  -> deleteProduct();
                 case 7  -> selectMultipleById();
                 case 8  -> selectMultipleBySku();
-                case 9  -> deleteMultipleById();
-                case 10 -> deleteMultipleBySku();
-                case 11 -> {return;}
+                case 9  -> deleteMultiple();
+                case 10 -> {return;}
                 default -> System.out.println("Invalid selection");
             }
         }
@@ -78,12 +77,21 @@ public class Main {
         }
     }
 
-    public static void deleteMultipleById(){
-
-    }
-
-    public static void deleteMultipleBySku(){
-
+    public static void deleteMultiple(){
+        ArrayList<Product> productList = new ArrayList<>();
+        ArrayList<Integer> confirmedDeleteList = new ArrayList<>();
+        while(true){
+            productList.addAll(lookUpProduct());
+            for (Product product: productList){
+                if(ScannerUtils.getYesNo(product + "\nAre you sure? \nY/N")){
+                    confirmedDeleteList.add(product.getId());
+                } else {productList.remove(product);}
+            }
+            database.deleteAll(confirmedDeleteList);
+            if(!ScannerUtils.getYesNo("Delete more products?")){
+                break;
+            }
+        }
     }
 
     private static void updateInfo(){

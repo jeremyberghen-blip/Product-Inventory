@@ -16,70 +16,41 @@ public class MockDao implements ProductDao{
 
     }
 
-    public void addProduct(Product product){
-        inventoryById.put(product.getId(), product);
-        inventoryBySku.put(product.getSku(), product);
-        System.out.println("Product successfully added");
+    public void addProduct(List<Product> productList){
+
     }
 
-    public Product getProductBySku(String sku){return inventoryBySku.get(sku);}
-
-    public Product getProductById(int id){return inventoryById.get(id);}
-
-    public List<Product> getAllProducts(){
-        return new ArrayList<>(inventoryById.values());
-    }
-
-    public List<Product> getLowStock(int threshold){
-        ArrayList<Product> results = new ArrayList<>();
-        for (Product p: getAllProducts()){
-            if(p.getStock() <= threshold){results.add(p);}
+    public List<Product> getLowStock(int stockThreshold){
+        List<Product> results = new ArrayList<>();
+        for(Product product: inventoryById.values()){
+            if (product.getStock() <= stockThreshold){results.add(product);}
         }
         return results;
     }
 
-    public List<Product> getListById(List<Integer> ids){
-        ArrayList<Product> results = new ArrayList<>();
-        for(int i: ids){results.add(inventoryById.get(i));}
+    public List<Product> getListById(List<Integer> IdList){
+        List<Product> results = new ArrayList<>();
+        for (int i: IdList){results.add(inventoryById.get(i));}
         return results;
     }
 
-    public List<Product> getListBySku(List<String> skus){
-        ArrayList<Product> results = new ArrayList<>();
-        for(String sku: skus){results.add(inventoryBySku.get(sku));}
+    public List<Product> getListBySku(List<String> skuList){
+        List<Product> results = new ArrayList<>();
+        for(String sku: skuList){results.add(inventoryBySku.get(sku));}
         return results;
     }
 
-    public void updateProduct(Product product){
-        inventoryById.replace(product.getId(), product);
-        inventoryBySku.replace(product.getSku(), product);
-        System.out.println("Product successfully updated");
-    }
-
-    public void updateAll(List<Product> list){
-        for(Product p: list){
-            inventoryById.replace(p.getId(), p);
-            inventoryBySku.replace(p.getSku(), p);
+    public void update(List<Product> productList){
+        for (Product product: productList){
+            inventoryById.replace(product.getId(), product);
+            inventoryBySku.replace(product.getSku(), product);
         }
-        System.out.println("Products successfully updated");
     }
 
-    public void deleteById(Product product){
-        inventoryBySku.remove(inventoryById.get(id).getSku());
-        inventoryById.remove(id);
-        System.out.println("Product successfully deleted");
-    }
-
-    public void deleteBySku(String sku){
-        inventoryById.remove(inventoryBySku.get(sku).getId());
-        inventoryBySku.remove(sku);
-        System.out.println("Product successfully deleted");
-    }
-
-    public void deleteAll(List<Product> productList){
-        for(int id: productList){
-            inventoryBySku.remove(inventoryById.get(id).getSku());
-            inventoryById.remove(id);
+    public void delete(List<Product> productList){
+        for (Product product: productList){
+            inventoryBySku.remove(product.getSku(), product);
+            inventoryById.remove(product.getId(), product);
         }
     }
 }

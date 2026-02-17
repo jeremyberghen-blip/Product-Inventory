@@ -2,8 +2,6 @@ package services;
 
 import models.Product;
 import dao.ProductDao;
-
-import java.util.ArrayList;
 import java.util.List;
 
 public class Services {
@@ -24,8 +22,9 @@ public class Services {
     }
 
     public void editProductInfo(List<Product> productList){
-        if (productList != null && !productList.isEmpty()){
-
+        if (!productList.isEmpty()){
+            productList.removeIf(product -> !verifyProduct(product));
+            dao.update(productList);
         }
     }
 
@@ -33,22 +32,16 @@ public class Services {
         return dao.getLowStock(threshold);
     }
 
-    public List<Product> productLookUpById(int id) {
-        return dao.getProductById(List.of(id));
-    }
-
-    public List<Product> productLookUpBySku(String sku){
-        if(verifySku(sku)) {
-            return dao.getProductBySku(List.of(sku));
-        } else {return null;}
-    }
-
-    public List<Product> getListById(ArrayList<Integer> list){
+    public List<Product> getListById(List<Integer> list){
         return dao.getListById(list);
     }
 
-    public List<Product> getListBySku(ArrayList<String> list){
+    public List<Product> getListBySku(List<String> list){
         return dao.getListBySku(list);
+    }
+
+    public void delete(List<Product> list){dao.delete(list);
+
     }
 
 

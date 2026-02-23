@@ -99,27 +99,34 @@ public class SQLiteDAO {
     }
 
     List<Product> getListBySku(List<String> skus){
-        Product product = new Product();
-        String sql = "SELECT * FROM inventory WHERE sku = ?;";
+        List<Product> productList = new ArrayList<>();
+
+        if(skus == null || skus.isEmpty()){System.out.println("invalid ID list"); return productList;}
+        String placeHolders = String.join(",", Collections.nCopies(skus.size(), "?"));
+        String sql = "SELECT * FROM inventory WHERE id IN (" + placeHolders + ")";
+
         try(Connection conn = this.connect();
             PreparedStatement statement = conn.prepareStatement(sql)) {
-            statement.setString(1, sku);
-            ResultSet results = statement.executeQuery();
-            if(results.next()){
-                product.setId(results.getInt("id"));
-                product.setName(results.getString("product_name"));
-                product.setSku(results.getString("sku"));
-                product.setPrice(results.getDouble("price"));
-                product.setStock(results.getInt("stock"));
+            for (String s: skus){
+                statement.setString(1, s);
             }
+            ResultSet results = statement.executeQuery();
+            while(results.next()){
+                Product product = new Product(results.getString("product_name"),
+                        results.getString("sku"),
+                        results.getInt("stock"),
+                        results.getDouble("price"));
+                product.setId(results.getInt("id"));
+                productList.add(product);
+            }
+            return productList;
         } catch (SQLException e){
             System.out.println("Save error: " + e.getMessage());
         }
-        return product;
+        return productList;
     }
 
     void update(List<Product> list){
-        Product product = productLookUpId(id);
         String sql = "UPDATE inventory " +
                 "SET product_name = ?," +
                 "sku = ?," +
@@ -129,12 +136,15 @@ public class SQLiteDAO {
 
         try(Connection conn = this.connect();
             PreparedStatement statement = conn.prepareStatement(sql)) {
-            statement.setString(1, updatedInfo.getName());
-            statement.setString(2, updatedInfo.getSku());
-            statement.setDouble(3, updatedInfo.getPrice());
-            statement.setInt(4, updatedInfo.getStock());
-            statement.setInt(5, product.getId());
-            statement.execute();
+            for (Product product: list){
+                statement.setString(1, product.getName());
+                statement.setString(2, product.getSku());
+                statement.setDouble(3, product.getPrice());
+                statement.setInt(4, product.getStock());
+                statement.setInt(5, product.getId());
+                statement.addBatch();
+            }
+            statement.executeBatch();
         } catch (SQLException e){
             System.out.println("Save error: " + e.getMessage());
         }
@@ -145,9 +155,11 @@ public class SQLiteDAO {
 
         try (Connection conn = this.connect();
              PreparedStatement statement = conn.prepareStatement(sql)){
-            statement.setInt(1, id);
-            statement.execute();
-            System.out.println("main.java.models.Product successfully deleted.");
+            for (Product product: productList){
+            statement.setInt(1, product.getId());
+            statement.addBatch();
+            }
+            statement.executeBatch();
         } catch (SQLException e){
             System.out.println("Delete error: " + e.getMessage());
         }

@@ -59,7 +59,7 @@ public class Main {
             product.setStock(ScannerUtils.getValidPositiveInt("Enter product quantity in stock: "));
             if(ScannerUtils.getYesNo(product + "\nIs this information correct? \nY/N: ")){
                 entries.add(product);
-                if(ScannerUtils.getYesNo("Add another product? \nY/N: ")){
+                if(!ScannerUtils.getYesNo("Add another product? \nY/N: ")){
                     database.saveProduct(entries);
                     return;
                 }
@@ -165,20 +165,21 @@ public class Main {
         } else {System.out.println("No items returned while updating");}
     }
 
-    public static void delete(){
-        ArrayList<Product> productList = new ArrayList<>();
-        ArrayList<Product>approvedDeleteList = new ArrayList<>();
-        while(true){
-            productList.addAll(lookUpProduct());
-            for (Product product: productList){
-                if(!ScannerUtils.getYesNo(product + "\nAre you sure? \nY/N")){
-                    approvedDeleteList.add(product);
-                    productList.remove(product);}
+    public static void delete() {
+        List<Product> searchResults = lookUpProduct();
+        List<Product> toDelete = new ArrayList<>();
+
+        if (searchResults != null) {
+            for (Product product : searchResults) {
+                if (ScannerUtils.getYesNo(product + "\nDelete this item? Y/N: ")) {
+                    toDelete.add(product);
+                }
             }
-            if(!ScannerUtils.getYesNo("Delete more products?")){
-                database.delete(approvedDeleteList);
-                break;
-            }
+        }
+
+        if (!toDelete.isEmpty()) {
+            database.delete(toDelete);
+            System.out.println("Items successfully deleted.");
         }
     }
 }

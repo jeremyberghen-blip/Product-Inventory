@@ -12,12 +12,7 @@ public class Services {
     }
 
     public void saveProduct(List<Product> productList){
-        for (Product product: productList){
-            if(!verifyProduct(product)){
-                System.out.println(product + "\nInvalid product. Cannot add to database");
-                productList.remove(product);
-            }
-        }
+        productList.removeIf(product ->!verifyProduct(product));
         dao.addProduct(productList);
     }
 

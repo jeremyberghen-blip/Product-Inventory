@@ -1,17 +1,22 @@
-package dao; //not safe, do not implement without fixing
+package dao;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.List;
 
 import models.Product;
 
 public class SQLiteDAO {
-    public void addProduct(){
+    public void initializeDB(){
+
+    }
+
+    public void addProduct(List<Product> productList){
         String sql = "INSERT INTO inventory (product_name, sku, price, stock)" +
-            "VALUES (?, ?, ?, ?)";
+                "VALUES (?, ?, ?, ?)";
         try(
-        Connection conn = this.connect();
-        PreparedStatement statement = conn.prepareStatement(sql)){
+                Connection conn = this.connect();
+                PreparedStatement statement = conn.prepareStatement(sql)){
             statement.setString(1, product.getName());
             statement.setString(2, product.getSku());
             statement.setDouble(3, product.getPrice());
@@ -19,74 +24,12 @@ public class SQLiteDAO {
             statement.execute();
             System.out.println("main.java.models.Product successfully saved");
         } catch (
-        SQLException e){
+                SQLException e){
             System.out.println("Save error: " + e.getMessage());
         }
     }
 
-    public ArrayList<Product> productLookUpName(String name){
-        ArrayList<Product> products = new ArrayList<>();
-        String sql = "SELECT * FROM inventory WHERE product_name = ?;";
-        try(Connection conn = this.connect();
-            PreparedStatement statement = conn.prepareStatement(sql)) {
-            statement.setString(1, name);
-            ResultSet results = statement.executeQuery();
-            while(results.next()){
-                Product  product = new Product();
-                product.setStock(results.getInt("stock"));
-                product.setPrice(results.getDouble("price"));
-                product.setSku(results.getString("sku"));
-                product.setName(results.getString("product_name"));
-                product.setId(results.getInt("id"));
-                products.add(product);
-            }
-        } catch (SQLException e){
-            System.out.println("Save error: " + e.getMessage());
-        }
-        return products;
-    }
-
-    public Product productLookUpSku(String sku){
-        Product product = new Product();
-        String sql = "SELECT * FROM inventory WHERE sku = ?;";
-        try(Connection conn = this.connect();
-            PreparedStatement statement = conn.prepareStatement(sql)) {
-            statement.setString(1, sku);
-            ResultSet results = statement.executeQuery();
-            if(results.next()){
-                product.setId(results.getInt("id"));
-                product.setName(results.getString("product_name"));
-                product.setSku(results.getString("sku"));
-                product.setPrice(results.getDouble("price"));
-                product.setStock(results.getInt("stock"));
-            }
-        } catch (SQLException e){
-            System.out.println("Save error: " + e.getMessage());
-        }
-        return product;
-    }
-
-    public Product productLookUpId(int id){
-        Product product = new Product();
-        String sql = "SELECT * FROM inventory WHERE id = ?;";
-        try(Connection conn = this.connect();
-            PreparedStatement statement = conn.prepareStatement(sql)) {
-            statement.setInt(1, id);
-            ResultSet results = statement.executeQuery();
-            if(results.next()){
-                product.setId(results.getInt("id"));
-                product.setName(results.getString("product_name"));
-                product.setSku(results.getString("sku"));
-                product.setPrice(results.getDouble("price"));
-                product.setStock(results.getInt("stock"));
-            }
-        } catch (SQLException e){
-            System.out.println("Save error: " + e.getMessage());
-        }
-        return product;
-    }
-
-    public ArrayList<Product> getLowStock(int threshold){
+    public List<Product> getLowStock(int threshold){
         ArrayList<Product> products = new ArrayList<>();
         String sql = "SELECT * FROM inventory WHERE stock = ?";
         for(int i = threshold; i >= 0; i--){
@@ -110,7 +53,47 @@ public class SQLiteDAO {
         return products;
     }
 
-    public void editProductInfo(int id, Product updatedInfo){
+    List<Product> getListById(List<Integer> ids){
+        Product product = new Product();
+        String sql = "SELECT * FROM inventory WHERE id = ?;";
+        try(Connection conn = this.connect();
+            PreparedStatement statement = conn.prepareStatement(sql)) {
+            statement.setInt(1, id);
+            ResultSet results = statement.executeQuery();
+            if(results.next()){
+                product.setId(results.getInt("id"));
+                product.setName(results.getString("product_name"));
+                product.setSku(results.getString("sku"));
+                product.setPrice(results.getDouble("price"));
+                product.setStock(results.getInt("stock"));
+            }
+        } catch (SQLException e){
+            System.out.println("Save error: " + e.getMessage());
+        }
+        return product;
+    }
+
+    List<Product> getListBySku(List<String> skus){
+        Product product = new Product();
+        String sql = "SELECT * FROM inventory WHERE sku = ?;";
+        try(Connection conn = this.connect();
+            PreparedStatement statement = conn.prepareStatement(sql)) {
+            statement.setString(1, sku);
+            ResultSet results = statement.executeQuery();
+            if(results.next()){
+                product.setId(results.getInt("id"));
+                product.setName(results.getString("product_name"));
+                product.setSku(results.getString("sku"));
+                product.setPrice(results.getDouble("price"));
+                product.setStock(results.getInt("stock"));
+            }
+        } catch (SQLException e){
+            System.out.println("Save error: " + e.getMessage());
+        }
+        return product;
+    }
+
+    void update(List<Product> list){
         Product product = productLookUpId(id);
         String sql = "UPDATE inventory " +
                 "SET product_name = ?," +
@@ -132,7 +115,18 @@ public class SQLiteDAO {
         }
     }
 
-    public Services(){initializeDatabase();}
+    void delete(List<Product> productList){
+        String sql = "DELETE FROM inventory WHERE id = ?";
+
+        try (Connection conn = this.connect();
+             PreparedStatement statement = conn.prepareStatement(sql)){
+            statement.setInt(1, id);
+            statement.execute();
+            System.out.println("main.java.models.Product successfully deleted.");
+        } catch (SQLException e){
+            System.out.println("Delete error: " + e.getMessage());
+        }
+    }
 
     private Connection connect(){
         String url = "jdbc:sqlite:inventory.db";
@@ -158,19 +152,6 @@ public class SQLiteDAO {
             statement.execute(sql);
         } catch (SQLException e) {
             System.out.println("Initialization error: " + e.getMessage());
-        }
-    }
-
-    public void deleteProduct(int id){
-        String sql = "DELETE FROM inventory WHERE id = ?";
-
-        try (Connection conn = this.connect();
-             PreparedStatement statement = conn.prepareStatement(sql)){
-            statement.setInt(1, id);
-            statement.execute();
-            System.out.println("main.java.models.Product successfully deleted.");
-        } catch (SQLException e){
-            System.out.println("Delete error: " + e.getMessage());
         }
     }
 }

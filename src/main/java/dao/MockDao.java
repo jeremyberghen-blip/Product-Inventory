@@ -53,15 +53,23 @@ public class MockDao implements ProductDao{
 
     public void update(List<Product> productList){
         for (Product product: productList){
-            inventoryById.replace(product.getId(), product);
-            inventoryBySku.replace(product.getSku(), product);
+            if(inventoryById.containsKey(product.getId())){
+                inventoryById.replace(product.getId(), product);
+            }
+            if(inventoryBySku.containsKey(product.getSku())){
+                inventoryBySku.replace(product.getSku(), product);
+            }
         }
     }
 
     public void delete(List<Product> productList){
         for (Product product: productList){
-            inventoryBySku.remove(product.getSku(), product);
-            inventoryById.remove(product.getId(), product);
+            if(inventoryById.containsKey(product.getId())){
+                inventoryBySku.remove(product.getSku(), product);
+            }
+            if(inventoryBySku.containsKey(product.getSku())){
+                inventoryById.remove(product.getId(), product);
+            }
         }
     }
 }

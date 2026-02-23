@@ -1,7 +1,7 @@
 package services;
 
 import models.Product;
-import dao.ProductDao;
+import dao.MockDao;
 import java.util.List;
 
 public class Services {

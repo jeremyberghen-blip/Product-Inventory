@@ -2,14 +2,29 @@ package dao;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import models.Product;
 
 public class SQLiteDAO {
     public void initializeDB(){
+        String sql = "CREATE TABLE IF NOT EXISTS inventory (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "product_name TEXT NOT NULL, " +
+                "sku TEXT UNIQUE NOT NULL, " +
+                "price REAL NOT NULL, " +
+                "stock INTEGER NOT NULL);";
 
+        try (Connection conn = this.connect();
+             Statement statement = conn.createStatement()) {
+            statement.execute(sql);
+        } catch (SQLException e) {
+            System.out.println("Initialization error: " + e.getMessage());
+        }
     }
+
+    public SQLiteDAO(){initializeDB();}
 
     public void addProduct(List<Product> productList){
         String sql = "INSERT INTO inventory (product_name, sku, price, stock)" +
@@ -17,11 +32,15 @@ public class SQLiteDAO {
         try(
                 Connection conn = this.connect();
                 PreparedStatement statement = conn.prepareStatement(sql)){
-            statement.setString(1, product.getName());
-            statement.setString(2, product.getSku());
-            statement.setDouble(3, product.getPrice());
-            statement.setInt(4, product.getQuantity());
-            statement.execute();
+            conn.setAutoCommit(false);
+            for (Product product: productList) {
+                statement.setString(1, product.getName());
+                statement.setString(2, product.getSku());
+                statement.setDouble(3, product.getPrice());
+                statement.setInt(4, product.getStock());
+                statement.addBatch();
+            }
+            statement.executeBatch();
             System.out.println("main.java.models.Product successfully saved");
         } catch (
                 SQLException e){
@@ -30,47 +49,53 @@ public class SQLiteDAO {
     }
 
     public List<Product> getLowStock(int threshold){
-        ArrayList<Product> products = new ArrayList<>();
-        String sql = "SELECT * FROM inventory WHERE stock = ?";
-        for(int i = threshold; i >= 0; i--){
-            try (Connection conn = this.connect();
-                 PreparedStatement statement = conn.prepareStatement(sql)){
-                statement.setInt(1, i);
-                ResultSet results = statement.executeQuery();
-                while (results.next()){
-                    Product product = new Product(
-                            results.getString("product_name"),
-                            results.getString("sku"),
-                            results.getInt("stock"),
-                            results.getDouble("price"));
-                    product.setId(results.getInt("id"));
-                    products.add(product);
+        List<Product> products = new ArrayList<>();
+        String sql = "SELECT * FROM inventory WHERE stock <= ?";
+        try (Connection conn = this.connect();
+            PreparedStatement statement = conn.prepareStatement(sql)){
+            statement.setInt(1, threshold);
+            ResultSet results = statement.executeQuery();
+            while (results.next()){
+                Product product = new Product(
+                        results.getString("product_name"),
+                        results.getString("sku"),
+                        results.getInt("stock"),
+                        results.getDouble("price"));
+                product.setId(results.getInt("id"));
+                products.add(product);
                 }
             } catch (SQLException e){
                 System.out.println("low stock error: " + e.getMessage());
             }
-        }
         return products;
     }
 
     List<Product> getListById(List<Integer> ids){
-        Product product = new Product();
-        String sql = "SELECT * FROM inventory WHERE id = ?;";
+        List<Product> productList = new ArrayList<>();
+
+        if(ids == null || ids.isEmpty()){System.out.println("invalid ID list"); return productList;}
+        String placeHolders = String.join(",", Collections.nCopies(ids.size(), "?"));
+        String sql = "SELECT * FROM inventory WHERE id IN (" + placeHolders + ")";
+
         try(Connection conn = this.connect();
             PreparedStatement statement = conn.prepareStatement(sql)) {
-            statement.setInt(1, id);
-            ResultSet results = statement.executeQuery();
-            if(results.next()){
-                product.setId(results.getInt("id"));
-                product.setName(results.getString("product_name"));
-                product.setSku(results.getString("sku"));
-                product.setPrice(results.getDouble("price"));
-                product.setStock(results.getInt("stock"));
+            for (int i: ids){
+                statement.setInt(1, i);
             }
+            ResultSet results = statement.executeQuery();
+            while(results.next()){
+                Product product = new Product(results.getString("product_name"),
+                        results.getString("sku"),
+                        results.getInt("stock"),
+                        results.getDouble("price"));
+                product.setId(results.getInt("id"));
+                productList.add(product);
+            }
+            return productList;
         } catch (SQLException e){
             System.out.println("Save error: " + e.getMessage());
         }
-        return product;
+        return productList;
     }
 
     List<Product> getListBySku(List<String> skus){
@@ -137,21 +162,5 @@ public class SQLiteDAO {
             System.out.println("Connection error: " + e.getMessage());
         }
         return conn;
-    }
-
-    public void initializeDatabase() {
-        String sql = "CREATE TABLE IF NOT EXISTS inventory (" +
-                "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                "product_name TEXT NOT NULL, " +
-                "sku TEXT UNIQUE NOT NULL, " +
-                "price REAL NOT NULL, " +
-                "stock INTEGER NOT NULL);";
-
-        try (Connection conn = this.connect();
-             Statement statement = conn.createStatement()) {
-            statement.execute(sql);
-        } catch (SQLException e) {
-            System.out.println("Initialization error: " + e.getMessage());
-        }
     }
 }

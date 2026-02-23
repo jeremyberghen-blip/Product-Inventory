@@ -56,9 +56,8 @@ public class MockDao implements ProductDao{
             if(inventoryById.containsKey(product.getId())){
                 inventoryById.replace(product.getId(), product);
             }
-            if(inventoryBySku.containsKey(product.getSku())){
-                inventoryBySku.replace(product.getSku(), product);
-            }
+            inventoryBySku.values().removeIf(p -> p.getId() == product.getId());
+            inventoryBySku.put(product.getSku(), product);
         }
     }
 

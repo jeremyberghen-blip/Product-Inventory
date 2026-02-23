@@ -78,6 +78,7 @@ public class Main {
                     List<Integer> idList = new ArrayList<>();
                     while(true){
                         idList.add(ScannerUtils.getValidInt("Enter product ID"));
+                        if(idList.getLast().equals(-1)){idList.removeLast();}
                         if(!ScannerUtils.getYesNo("Lookup more products by ID? \nY/N: ")){
                             return database.getListById(idList);
                         }
@@ -87,6 +88,7 @@ public class Main {
                     List<String> skuList= new ArrayList<>();
                     while (true){
                         skuList.add(ScannerUtils.getValidString("Enter sku: "));
+                        if(skuList.getLast().equalsIgnoreCase("exit")){skuList.removeLast();}
                         if(!ScannerUtils.getYesNo("Lookup more products by SKU? \nY/N: ")){
                             return database.getListBySku(skuList);
                         }
@@ -102,7 +104,8 @@ public class Main {
         ArrayList<Integer> ids = new ArrayList<>();
         while (true){
             ids.add(ScannerUtils.getValidInt("Enter product ID: "));
-            if(ids.getLast() == null || !ScannerUtils.getYesNo("Select another product?: \nY/n")){break;}
+            if(ids.getLast().equals(-1)){ids.removeLast();}
+            if(!ScannerUtils.getYesNo("Select another product?: \nY/n")){break;}
         }
         ArrayList<Product> results = new ArrayList<>(database.getListById(ids));
         for (Product product: results){
@@ -114,6 +117,7 @@ public class Main {
         ArrayList<String> skus = new ArrayList<>();
         while (true){
             skus.add(ScannerUtils.getValidString("Enter product ID: "));
+            if(skus.getLast().equalsIgnoreCase("exit")){skus.removeLast();}
             if(skus.getLast() == null || !ScannerUtils.getYesNo("Select another product?: \nY/n")){break;}
         }
         ArrayList<Product> results = new ArrayList<>(database.getListBySku(skus));

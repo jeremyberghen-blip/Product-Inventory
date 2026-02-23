@@ -7,7 +7,7 @@ import java.util.List;
 
 import models.Product;
 
-public class SQLiteDAO {
+public class SQLiteDAO implements ProductDao{
     public void initializeDB(){
         String sql = "CREATE TABLE IF NOT EXISTS inventory (" +
                 "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -70,7 +70,7 @@ public class SQLiteDAO {
         return products;
     }
 
-    List<Product> getListById(List<Integer> ids){
+    public List<Product> getListById(List<Integer> ids){
         List<Product> productList = new ArrayList<>();
 
         if(ids == null || ids.isEmpty()){System.out.println("invalid ID list"); return productList;}
@@ -98,7 +98,7 @@ public class SQLiteDAO {
         return productList;
     }
 
-    List<Product> getListBySku(List<String> skus){
+    public List<Product> getListBySku(List<String> skus){
         List<Product> productList = new ArrayList<>();
 
         if(skus == null || skus.isEmpty()){System.out.println("invalid ID list"); return productList;}
@@ -126,7 +126,7 @@ public class SQLiteDAO {
         return productList;
     }
 
-    void update(List<Product> list){
+    public void update(List<Product> list){
         String sql = "UPDATE inventory " +
                 "SET product_name = ?," +
                 "sku = ?," +
@@ -150,7 +150,7 @@ public class SQLiteDAO {
         }
     }
 
-    void delete(List<Product> productList){
+    public void delete(List<Product> productList){
         String sql = "DELETE FROM inventory WHERE id = ?";
 
         try (Connection conn = this.connect();

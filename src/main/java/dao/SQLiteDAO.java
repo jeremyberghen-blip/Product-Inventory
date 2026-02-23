@@ -41,6 +41,7 @@ public class SQLiteDAO implements ProductDao{
                 statement.addBatch();
             }
             statement.executeBatch();
+            conn.commit();
             System.out.println("main.java.models.Product successfully saved");
         } catch (
                 SQLException e){
@@ -79,8 +80,9 @@ public class SQLiteDAO implements ProductDao{
 
         try(Connection conn = this.connect();
             PreparedStatement statement = conn.prepareStatement(sql)) {
+            int index = 1;
             for (int i: ids){
-                statement.setInt(1, i);
+                statement.setInt(index++, i);
             }
             ResultSet results = statement.executeQuery();
             while(results.next()){
@@ -107,8 +109,9 @@ public class SQLiteDAO implements ProductDao{
 
         try(Connection conn = this.connect();
             PreparedStatement statement = conn.prepareStatement(sql)) {
+            int index = 1;
             for (String s: skus){
-                statement.setString(1, s);
+                statement.setString(index++, s);
             }
             ResultSet results = statement.executeQuery();
             while(results.next()){
